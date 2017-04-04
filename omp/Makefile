@@ -70,7 +70,7 @@ default: fmm
 print-%  : ; @echo $* = $($*)
 
 $(TARGET): $(OBJS)
-	$(CC) $(OBJS) -Wall $(LIBS) -o $@
+	$(CC) $(OBJS) $(LINKER_OPTS) $(LIBS) -o $@
 
 %.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) -c $< -o $@
