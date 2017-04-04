@@ -39,10 +39,6 @@ int main(int argc, char** argv)
 
     t_timer timer;
     start(&timer);
-    #ifdef _OPENMP
-    #pragma omp parallel
-    #pragma omp single
-    #endif
     perform_fmm(&options);
     // direct_tree(&options);
     stop(&timer);
