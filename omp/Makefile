@@ -65,7 +65,7 @@ SRCS = $(addprefix $(REF_DIR)/, $(filter-out $(DIFF_SRCS), $(notdir $(REF_SRCS))
 SRCS += $(DIFF_SRCS)
 OBJS = $(patsubst %.c,%.o,$(SRCS))
 
-default: fmm
+default: $(TARGET)
 
 print-%  : ; @echo $* = $($*)
 

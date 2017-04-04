@@ -51,7 +51,7 @@ LIBS += -lgsl -lgslcblas -lm
 HEADERS = $(wildcard *.h)
 OBJECTS=main.o util.o tree.o parse_args.o kernels.o traversal.o verify.o initialise.o
 
-default: fmm
+default: $(TARGET)
 
 $(TARGET): $(OBJECTS)	
 	$(CC) $(OBJECTS) $(LINKER_OPTS) $(LIBS) -o $@
