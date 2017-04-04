@@ -21,23 +21,14 @@ TYPE get_l2_error(TYPE* estimate, TYPE* actual, size_t num_points, size_t lda_ex
     return TYPE_SQRT(diff/norm);
 }
 
-void direct_method(double* __restrict__ points, double* __restrict__ m, size_t num_samples, size_t num_points, double* __restrict__ a, double* __restrict__ pot)
+void direct_method(double* points, double* m, size_t num_samples, size_t num_points, double* a, double* pot)
 {
-    double* __restrict__ x = &points[0*num_points];
-    double* __restrict__ y = &points[1*num_points];
-    double* __restrict__ z = &points[2*num_points];
-    double* __restrict__ ax = &a[0*num_samples];
-    double* __restrict__ ay = &a[1*num_samples];
-    double* __restrict__ az = &a[2*num_samples];
-
-    x   = (double*)__builtin_assume_aligned(x, 32);
-    y   = (double*)__builtin_assume_aligned(y, 32);
-    z   = (double*)__builtin_assume_aligned(z, 32);
-    ax  = (double*)__builtin_assume_aligned(ax, 32);
-    ay  = (double*)__builtin_assume_aligned(ay, 32);
-    az  = (double*)__builtin_assume_aligned(az, 32);
-    m   = (double*)__builtin_assume_aligned(m, 32);
-    pot = (double*)__builtin_assume_aligned(pot, 32);
+    double* x = &points[0*num_points];
+    double* y = &points[1*num_points];
+    double* z = &points[2*num_points];
+    double* ax = &a[0*num_samples];
+    double* ay = &a[1*num_samples];
+    double* az = &a[2*num_samples];
 
     for (size_t i = 0; i < num_samples; ++i)
     {
