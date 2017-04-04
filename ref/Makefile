@@ -18,12 +18,12 @@ else
 	CFLAGS += -march=native
 endif
 
-LIBS += -lgsl -lgslcblas -lm -fopenmp
+LIBS += -lgsl -lgslcblas -lm
 
 ifeq ($(CC), icc)
-	CFLAGS += -qopenmp
+	CFLAGS += 
 else
-	CFLAGS += -fopenmp
+	CFLAGS += 
 endif
 
 HEADERS = $(wildcard *.h)
