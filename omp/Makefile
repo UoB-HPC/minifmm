@@ -26,17 +26,27 @@ else
 	CFLAGS += -fopenmp
 endif
 
-HEADERS = $(wildcard *.h)
-OBJECTS=main.o util.o tree.o parse_args.o kernels.o traversal.o verify.o initialise.o
+REF_DIR=$(abspath $(shell pwd)/../ref)
+CFLAGS += -I $(REF_DIR)
+
+HEADERS=$(wildcard $(REF_DIR)/*.h)
+REF_SRCS=$(wildcard $(REF_DIR)/*.c)
+DIFF_SRCS=$(wildcard *.c)
+
+SRCS = $(addprefix $(REF_DIR)/, $(filter-out $(DIFF_SRCS), $(notdir $(REF_SRCS))))
+SRCS += $(DIFF_SRCS)
+OBJS = $(patsubst %.c,%.o,$(SRCS))
 
 default: fmm
 
-$(TARGET): $(OBJECTS)	
-	$(CC) $(OBJECTS) -Wall $(LIBS) -o $@
+print-%  : ; @echo $* = $($*)
+
+$(TARGET): $(OBJS)
+	$(CC) $(OBJS) -Wall $(LIBS) -o $@
 
 %.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	-rm -f *.o
+	-rm -f $(OBJS)
 	-rm -f $(TARGET)
