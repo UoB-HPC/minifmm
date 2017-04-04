@@ -54,7 +54,7 @@ OBJECTS=main.o util.o tree.o parse_args.o kernels.o traversal.o verify.o initial
 default: fmm
 
 $(TARGET): $(OBJECTS)	
-	$(CC) $(OBJECTS) -Wall $(LIBS) -o $@
+	$(CC) $(OBJECTS) $(LINKER_OPTS) $(LIBS) -o $@
 
 %.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) -c $< -o $@
