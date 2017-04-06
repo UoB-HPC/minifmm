@@ -10,7 +10,7 @@
 const static size_t DEFAULT_NUM_POINTS      = 100000;
 const static size_t DEFAULT_NCRIT           = 200;
 const static int DEFAULT_NUM_TERMS          = 10;
-const static double DEFAULT_THETA           = 0.5;
+const static TYPE DEFAULT_THETA           = 0.5;
 const static size_t DEFAULT_NUM_SAMPLES     = 100;
 
 void init_defaults(t_fmm_options* options)

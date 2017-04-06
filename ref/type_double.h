@@ -20,3 +20,4 @@
 #define TYPE_CPOW(x,y) cpow(x,y)
 #define TYPE_CEXP(x) cexp(x)
 #define TYPE_ABS(x) fabs(x)
+#define TYPE_CONJ(x) conj(x)

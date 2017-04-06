@@ -21,27 +21,27 @@ TYPE get_l2_error(TYPE* estimate, TYPE* actual, size_t num_points, size_t lda_ex
     return TYPE_SQRT(diff/norm);
 }
 
-void direct_method(double* points, double* m, size_t num_samples, size_t num_points, double* a, double* pot)
+void direct_method(TYPE* points, TYPE* m, size_t num_samples, size_t num_points, TYPE* a, TYPE* pot)
 {
-    double* x = &points[0*num_points];
-    double* y = &points[1*num_points];
-    double* z = &points[2*num_points];
-    double* ax = &a[0*num_samples];
-    double* ay = &a[1*num_samples];
-    double* az = &a[2*num_samples];
+    TYPE* x = &points[0*num_points];
+    TYPE* y = &points[1*num_points];
+    TYPE* z = &points[2*num_points];
+    TYPE* ax = &a[0*num_samples];
+    TYPE* ay = &a[1*num_samples];
+    TYPE* az = &a[2*num_samples];
 
     for (size_t i = 0; i < num_samples; ++i)
     {
-        double axt = 0.0, ayt = 0.0, azt = 0.0, pott = 0.0;
-        double xi = x[i], yi = y[i], zi = z[i];
+        TYPE axt = 0.0, ayt = 0.0, azt = 0.0, pott = 0.0;
+        TYPE xi = x[i], yi = y[i], zi = z[i];
         for (size_t j = 0; j < num_points; ++j)
         {
-            double dx = x[j] - xi;
-            double dy = y[j] - yi;
-            double dz = z[j] - zi;
-            double r = sqrt(dx*dx + dy*dy + dz*dz);
-            double inv_r = (r == 0.0) ? 0.0 : 1.0/r;
-            double inv_r_cubed = inv_r*inv_r*inv_r;
+            TYPE dx = x[j] - xi;
+            TYPE dy = y[j] - yi;
+            TYPE dz = z[j] - zi;
+            TYPE r = sqrt(dx*dx + dy*dy + dz*dz);
+            TYPE inv_r = (r == 0.0) ? 0.0 : 1.0/r;
+            TYPE inv_r_cubed = inv_r*inv_r*inv_r;
             axt += m[j]*dx*inv_r_cubed;
             ayt += m[j]*dy*inv_r_cubed;
             azt += m[j]*dz*inv_r_cubed;

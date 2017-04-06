@@ -54,14 +54,14 @@ void precompute(t_fmm_options* options)
 
 void init_data(t_fmm_options* options)
 {
-    options->points = (double*)malloc(sizeof(double)*options->num_points*3);
-    options->points_ordered = (double*)malloc(sizeof(double)*options->num_points*3);
+    options->points = (TYPE*)malloc(sizeof(TYPE)*options->num_points*3);
+    options->points_ordered = (TYPE*)malloc(sizeof(TYPE)*options->num_points*3);
     
-    options->weights = (double*)malloc(sizeof(double)*options->num_points);
-    options->weights_ordered = (double*)malloc(sizeof(double)*options->num_points);
+    options->weights = (TYPE*)malloc(sizeof(TYPE)*options->num_points);
+    options->weights_ordered = (TYPE*)malloc(sizeof(TYPE)*options->num_points);
 
-    options->acc = (double*)malloc(sizeof(double)*options->num_points*3);
-    options->pot = (double*)malloc(sizeof(double)*options->num_points);
+    options->acc = (TYPE*)malloc(sizeof(TYPE)*options->num_points*3);
+    options->pot = (TYPE*)malloc(sizeof(TYPE)*options->num_points);
     
     // seed_rng(time(NULL));
     seed_rng(42);

@@ -7,6 +7,7 @@
 #include "tree.h"
 #include "util.h"
 #include "kernels.h"
+#include "spharm.h"
 
 #define M_INDEX(n, m) ((n)*(n)+((m)+(n)))
 
@@ -35,55 +36,6 @@ void sph_unit_to_cart_unit(TYPE r, TYPE theta, TYPE phi, TYPE grad_r, TYPE grad_
     *x = TYPE_SIN(theta)*TYPE_COS(phi)*grad_r + TYPE_COS(theta)*TYPE_COS(phi)*grad_theta - TYPE_SIN(phi)*grad_phi;
     *y = TYPE_SIN(theta)*TYPE_SIN(phi)*grad_r + TYPE_COS(theta)*TYPE_SIN(phi)*grad_theta + TYPE_COS(phi)*grad_phi;
     *z = TYPE_COS(theta)*              grad_r - TYPE_SIN(theta)         *grad_theta;
-}
-
-// this function hasn't been checked
-void spharm_r_n(t_fmm_options* options, TYPE base_r, TYPE mult_r, TYPE theta, TYPE phi, TYPE_COMPLEX* Y_rn)
-{
-    int num_terms = options->num_terms;
-    size_t array_size = gsl_sf_legendre_array_n(num_terms-1);
-    TYPE p_temp[array_size];
-    gsl_sf_legendre_array_e(GSL_SF_LEGENDRE_NONE, num_terms-1, cos(theta), -1.0, p_temp);
-
-    TYPE power_r = base_r;
-    for (int n = 0; n < num_terms; ++n)
-    {
-        int m = 0;
-        Y_rn[n*n+n+m] = options->spharm_factor[n*n+n+m]*p_temp[n*(n+1)/2+m]*TYPE_CEXP(I*m*phi)*power_r;
-        for (m = 1; m <= n; ++m)
-        {
-            Y_rn[n*n+n+m] = options->spharm_factor[n*n+n+m]*p_temp[n*(n+1)/2+m]*TYPE_CEXP(I*m*phi)*power_r;
-            Y_rn[n*n+n-m] = conj(Y_rn[n*n+n+m]);
-        }
-        power_r *= mult_r;
-    }
-}
-
-void spharm_r_n_d_theta(t_fmm_options* options, TYPE base_r, TYPE mult_r, TYPE theta, TYPE phi, TYPE_COMPLEX* Y_rn, TYPE_COMPLEX* Y_rn_div_theta)
-{
-    int num_terms = options->num_terms;
-    size_t array_size = gsl_sf_legendre_array_n(num_terms-1);
-    TYPE p_temp[array_size];
-    TYPE p_temp_div[array_size];
-
-    gsl_sf_legendre_deriv_alt_array_e(GSL_SF_LEGENDRE_NONE, num_terms-1, cos(theta), -1.0, p_temp, p_temp_div);
-
-    TYPE power_r = base_r;
-    for (int n = 0; n < num_terms; ++n)
-    {
-        int m = 0;
-        Y_rn[n*n+n+m] = options->spharm_factor[n*n+n+m]*p_temp[n*(n+1)/2+m]*TYPE_CEXP(I*m*phi)*power_r;
-        Y_rn_div_theta[n*n+n+m] = options->spharm_factor[n*n+n+m]*p_temp_div[n*(n+1)/2+m]*TYPE_CEXP(I*m*phi)*power_r;
-
-        for (m = 1; m <= n; ++m)
-        {
-            Y_rn[n*n+n+m] = options->spharm_factor[n*n+n+m]*p_temp[n*(n+1)/2+m]*TYPE_CEXP(I*m*phi)*power_r;
-            Y_rn[n*n+n-m] = conj(Y_rn[n*n+n+m]);
-
-            Y_rn_div_theta[n*n+n+m] = options->spharm_factor[n*n+n+m]*p_temp_div[n*(n+1)/2+m]*TYPE_CEXP(I*m*phi)*power_r;
-        }
-        power_r *= mult_r;
-    }
 }
 
 // do we need to make this mutual, i.e. add to one, sub from other?
