@@ -1,7 +1,5 @@
 #include <stdlib.h>
 
-#include <gsl/gsl_sf_legendre.h>
-
 #include "type.h"
 #include "params.h"
 #include "tree.h"
