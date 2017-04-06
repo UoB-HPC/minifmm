@@ -58,15 +58,15 @@ void p2p(t_fmm_options* options, t_node* target, t_node* source)
     for (size_t i = 0; i < t_num_points; ++i)
     {
         TYPE ax = 0.0, ay = 0.0, az = 0.0, p = 0.0;
-        TYPE xi = tx[i], yi = ty[i], zi = tz[i];
+        const TYPE xi = tx[i], yi = ty[i], zi = tz[i];
         for (size_t j = 0; j < s_num_points; ++j)
         {
-            TYPE dx = sx[j] - xi;
-            TYPE dy = sy[j] - yi;
-            TYPE dz = sz[j] - zi;
+            const TYPE dx = sx[j] - xi;
+            const TYPE dy = sy[j] - yi;
+            const TYPE dz = sz[j] - zi;
 
-            TYPE inv_r = TYPE_ONE/TYPE_SQRT(dx*dx + dy*dy + dz*dz);
-            TYPE inv_r_3 = inv_r * inv_r * inv_r;
+            const TYPE inv_r = TYPE_ONE/TYPE_SQRT(dx*dx + dy*dy + dz*dz);
+            const TYPE inv_r_3 = inv_r * inv_r * inv_r;
             ax += sw[j]*dx*inv_r_3;
             ay += sw[j]*dy*inv_r_3;
             az += sw[j]*dz*inv_r_3;
