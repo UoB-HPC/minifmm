@@ -40,17 +40,17 @@ void sph_unit_to_cart_unit(TYPE r, TYPE theta, TYPE phi, TYPE grad_r, TYPE grad_
 // leaf 1 = target, leaf 2 = source
 void p2p(t_fmm_options* options, t_node* target, t_node* source)
 {
-    const TYPE* __restrict__ tx = target->x;
-    const TYPE* __restrict__ ty = target->y;
-    const TYPE* __restrict__ tz = target->z;
-    const TYPE* __restrict__ sx = source->x;
-    const TYPE* __restrict__ sy = source->y;
-    const TYPE* __restrict__ sz = source->z;
-    const TYPE* __restrict__ sw = source->w;
-    const TYPE* __restrict__ tax = target->ax;
-    const TYPE* __restrict__ tay = target->ay;
-    const TYPE* __restrict__ taz = target->az;
-    const TYPE* __restrict__ tp = target->p;
+    const TYPE* const __restrict__ tx = target->x;
+    const TYPE* const __restrict__ ty = target->y;
+    const TYPE* const __restrict__ tz = target->z;
+    const TYPE* const __restrict__ sx = source->x;
+    const TYPE* const __restrict__ sy = source->y;
+    const TYPE* const __restrict__ sz = source->z;
+    const TYPE* const __restrict__ sw = source->w;
+    TYPE* const __restrict__ tax = target->ax;
+    TYPE* const __restrict__ tay = target->ay;
+    TYPE* const __restrict__ taz = target->az;
+    TYPE* const __restrict__ tp = target->p;
 
     for (size_t i = 0; i < target->num_points; ++i)
     {
