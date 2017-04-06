@@ -52,11 +52,14 @@ void p2p(t_fmm_options* options, t_node* target, t_node* source)
     TYPE* const __restrict__ taz = target->az;
     TYPE* const __restrict__ tp = target->p;
 
-    for (size_t i = 0; i < target->num_points; ++i)
+    const size_t t_num_points = target->num_points;
+    const size_t s_num_points = source->num_points;
+
+    for (size_t i = 0; i < t_num_points; ++i)
     {
         TYPE ax = 0.0, ay = 0.0, az = 0.0, p = 0.0;
         TYPE xi = tx[i], yi = ty[i], zi = tz[i];
-        for (size_t j = 0; j < source->num_points; ++j)
+        for (size_t j = 0; j < s_num_points; ++j)
         {
             TYPE dx = sx[j] - xi;
             TYPE dy = sy[j] - yi;
