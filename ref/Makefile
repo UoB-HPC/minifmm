@@ -39,17 +39,10 @@ else
 	CFLAGS += -DUSE_FLOAT
 endif
 
-
-HOSTNAME=$(shell hostname)
-ifeq ($(HOSTNAME), swan)
-	LIBS += -L /lus/scratch/p02340/gsl/lib
-	CFLAGS += -I /lus/scratch/p02340/gsl/include
-endif
-
-LIBS += -lgsl -lgslcblas -lm
+LIBS += -lm
 
 HEADERS = $(wildcard *.h)
-OBJECTS=main.o util.o tree.o parse_args.o kernels.o traversal.o verify.o initialise.o
+OBJECTS=main.o util.o tree.o parse_args.o kernels.o traversal.o verify.o initialise.o spharm.o
 
 default: $(TARGET)
 
