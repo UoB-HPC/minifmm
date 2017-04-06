@@ -79,6 +79,98 @@ void p2p(t_fmm_options* options, t_node* target, t_node* source)
     }
 }
 
+#include "immintrin.h"
+
+void p2p_intrinsics(t_fmm_options* options, t_node* target, t_node* source)
+{
+    const TYPE* const __restrict__ tx = target->x;
+    const TYPE* const __restrict__ ty = target->y;
+    const TYPE* const __restrict__ tz = target->z;
+    const TYPE* const __restrict__ sx = source->x;
+    const TYPE* const __restrict__ sy = source->y;
+    const TYPE* const __restrict__ sz = source->z;
+    const TYPE* const __restrict__ sw = source->w;
+    TYPE* const __restrict__ tax = target->ax;
+    TYPE* const __restrict__ tay = target->ay;
+    TYPE* const __restrict__ taz = target->az;
+    TYPE* const __restrict__ tp = target->p;
+
+    const size_t t_num_points = target->num_points;
+    const size_t s_num_points = source->num_points;
+
+    __m256d one = _mm256_set1_pd(1.0);
+    size_t i;
+    for (i = 0; i < t_num_points-4; i += 4)
+    {
+        __m256d ax = _mm256_setzero_pd(), ay = _mm256_setzero_pd(), az = _mm256_setzero_pd(), p = _mm256_setzero_pd();
+        __m256d xi = _mm256_loadu_pd(&tx[i]);
+        __m256d yi = _mm256_loadu_pd(&ty[i]);
+        __m256d zi = _mm256_loadu_pd(&tz[i]);
+        
+        for (size_t j = 0; j < s_num_points; ++j)
+        {
+            __m256d dx = _mm256_set1_pd(sx[j]);
+            dx = _mm256_sub_pd(dx, xi);
+            __m256d dy = _mm256_set1_pd(sy[j]);
+            dy = _mm256_sub_pd(dy, yi);
+            __m256d dz = _mm256_set1_pd(sz[j]);
+            dz = _mm256_sub_pd(dz, zi);
+
+            __m256d inv_r = _mm256_mul_pd(dx, dx);
+            inv_r = _mm256_add_pd(inv_r, _mm256_mul_pd(dy, dy));
+            inv_r = _mm256_add_pd(inv_r, _mm256_mul_pd(dz, dz));
+            inv_r = _mm256_sqrt_pd(inv_r);
+            inv_r = _mm256_div_pd(one, inv_r);
+
+            __m256d w = _mm256_set1_pd(sw[j]);
+            __m256d w_inv_r_3 = _mm256_mul_pd(w, _mm256_mul_pd(inv_r, _mm256_mul_pd(inv_r, inv_r)));
+            ax = _mm256_add_pd(ax, _mm256_mul_pd(w_inv_r_3, dx));
+            ay = _mm256_add_pd(ay, _mm256_mul_pd(w_inv_r_3, dy));
+            az =_mm256_add_pd(az, _mm256_mul_pd(w_inv_r_3, dz));
+            p = _mm256_add_pd(p, _mm256_mul_pd(w, inv_r));
+        }
+
+        __m256d tmp_tax = _mm256_loadu_pd(&tax[i]);
+        tmp_tax = _mm256_add_pd(tmp_tax, ax);
+        _mm256_storeu_pd(&tax[i], tmp_tax);
+
+        __m256d tmp_tay = _mm256_loadu_pd(&tay[i]);
+        tmp_tay = _mm256_add_pd(tmp_tay, ay);
+        _mm256_storeu_pd(&tay[i], tmp_tay);
+
+        __m256d tmp_taz = _mm256_loadu_pd(&taz[i]);
+        tmp_taz = _mm256_add_pd(tmp_taz, az);
+        _mm256_storeu_pd(&taz[i], tmp_taz);
+
+        __m256d tmp_tp = _mm256_loadu_pd(&tp[i]);
+        tmp_tp = _mm256_add_pd(tmp_tp, p);
+        _mm256_storeu_pd(&tp[i], tmp_tp);
+    }
+    
+    for (; i < t_num_points; ++i)
+    {
+        TYPE ax = 0.0, ay = 0.0, az = 0.0, p = 0.0;
+        const TYPE xi = tx[i], yi = ty[i], zi = tz[i];
+        for (size_t j = 0; j < s_num_points; ++j)
+        {
+            const TYPE dx = sx[j] - xi;
+            const TYPE dy = sy[j] - yi;
+            const TYPE dz = sz[j] - zi;
+
+            const TYPE inv_r = TYPE_ONE/TYPE_SQRT(dx*dx + dy*dy + dz*dz);
+            const TYPE inv_r_3 = inv_r * inv_r * inv_r;
+            ax += sw[j]*dx*inv_r_3;
+            ay += sw[j]*dy*inv_r_3;
+            az += sw[j]*dz*inv_r_3;
+            p += sw[j]*inv_r;
+        }
+        tax[i] += ax;
+        tay[i] += ay;
+        taz[i] += az;
+        tp[i] += p;
+    }
+}
+
 void p2p_one_node(t_fmm_options* options, t_node* node)
 {
     for (size_t i = 0; i < node->num_points; ++i)
