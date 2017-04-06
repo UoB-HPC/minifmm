@@ -104,10 +104,13 @@ void dual_tree_traversal_core(t_fmm_options* options, t_node* target, t_node* so
         const TYPE* az __attribute__((unused)) = target->az;
         const TYPE* p __attribute__((unused)) = target->p;
         const size_t end = target->num_points;
-        #pragma omp task depend(out: ax[0:end], ay[0:end], az[0:end], p[0:end])
 #endif
-        // if (target == source) p2p_one_node(options, target); 
-        p2p(options, target, source);
+        if (source == target)
+        #pragma omp task depend(out: ax[0:end], ay[0:end], az[0:end], p[0:end])
+            p2p_one_node(options, target); 
+        else
+        #pragma omp task depend(out: ax[0:end], ay[0:end], az[0:end], p[0:end])
+            p2p(options, target, source);
     }
     else
     {

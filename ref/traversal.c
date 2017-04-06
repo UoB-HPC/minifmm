@@ -65,8 +65,8 @@ void dual_tree_traversal_core(t_fmm_options* options, t_node* target, t_node* so
     }
     else if (is_leaf(source) && is_leaf(target))
     {
-        // if (target == source) p2p_one_node(options, target); 
-        p2p(options, target, source);
+        if (target == source) p2p_one_node(options, target); 
+        else p2p(options, target, source);
     }
     else
     {

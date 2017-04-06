@@ -50,8 +50,7 @@ void p2p(t_fmm_options* options, t_node* target, t_node* source)
             TYPE dy = source->y[j] - yi;
             TYPE dz = source->z[j] - zi;
 
-            TYPE r = TYPE_SQRT(dx*dx + dy*dy + dz*dz);
-            TYPE inv_r = (r == 0.0) ? 0.0 : 1.0/r;
+            TYPE inv_r = TYPE_ONE/TYPE_SQRT(dx*dx + dy*dy + dz*dz);
             TYPE inv_r_3 = inv_r * inv_r * inv_r;
             ax += source->w[j]*dx*inv_r_3;
             ay += source->w[j]*dy*inv_r_3;
