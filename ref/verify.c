@@ -66,4 +66,7 @@ void verify(t_fmm_options* options, TYPE* a_err, TYPE* p_err)
 
     *a_err = get_l2_error(options->acc, acc_exact, options->num_samples, options->num_samples, options->num_points, 3);
     *p_err = get_l2_error(options->pot, pot_exact, options->num_samples, 0, 0, 1);
+
+    free(acc_exact);
+    free(pot_exact);
 }

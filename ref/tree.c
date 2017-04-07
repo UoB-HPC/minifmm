@@ -31,6 +31,14 @@ t_node* allocate_node(t_fmm_options* options)
     return node;
 }
 
+void free_node(t_node* node)
+{
+    free(node->M);
+    free(node->L);
+    free(node);
+    --__num_node_allocations;
+}
+
 size_t get_num_nodes() { return __num_node_allocations; }
 
 void construct_tree(t_node* parent, size_t start, size_t end, size_t ncrit, TYPE* points, TYPE* weights,
@@ -132,4 +140,15 @@ void build_tree(t_fmm_options* options)
     printf("Tree has %zu nodes\n", options->num_nodes);
 
     options->root = root;
+}
+
+void free_tree_core(t_node* node)
+{
+    for (size_t i = 0; i < node->num_children; ++i) free_node(node->child[i]);
+    free_node(node);
+}
+
+void free_tree(t_fmm_options* options)
+{
+    free_tree_core(options->root);
 }

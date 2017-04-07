@@ -28,3 +28,5 @@ static inline
 int is_leaf(t_node* node) { return node->num_children == 0; }
 
 void build_tree(t_fmm_options* options);
+
+void free_tree(t_fmm_options* options);
