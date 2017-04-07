@@ -81,6 +81,7 @@ void p2p(t_fmm_options* options, t_node* target, t_node* source)
 
 #include "immintrin.h"
 
+#ifdef USE_DOUBLE
 void p2p_intrinsics(t_fmm_options* options, t_node* target, t_node* source)
 {
     const TYPE* const __restrict__ tx = target->x;
@@ -171,6 +172,7 @@ void p2p_intrinsics(t_fmm_options* options, t_node* target, t_node* source)
         tp[i] += p;
     }
 }
+#endif
 
 void p2p_one_node(t_fmm_options* options, t_node* node)
 {
