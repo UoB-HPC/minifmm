@@ -144,7 +144,7 @@ void build_tree(t_fmm_options* options)
 
 void free_tree_core(t_node* node)
 {
-    for (size_t i = 0; i < node->num_children; ++i) free_node(node->child[i]);
+    for (size_t i = 0; i < node->num_children; ++i) free_tree_core(node->child[i]);
     free_node(node);
 }
 
