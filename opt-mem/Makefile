@@ -38,7 +38,7 @@ else
 	CFLAGS += -DUSE_FLOAT
 endif
 
-LIBS += -lgsl -lgslcblas -lm
+LIBS = -lm
 
 REF_DIR=$(abspath $(shell pwd)/../ref)
 CFLAGS += -I $(REF_DIR)
