@@ -303,21 +303,13 @@ void m2l(t_fmm_options* options, t_node* target, t_node* source)
             int jk = j*j+j+k;
             for (int n = 0; n < options->num_terms-j; ++n)
             {
-                for (int m = -n; m < 0; ++m)
+                for (int m = -n; m <= n; ++m)
                 {
                     int nm = n*n+n+m;
                     int cindex = jk*options->num_terms*options->num_terms + nm;
-                    int index = MS_INDEX(n,-m);
                     int spharm_index = (j+n)*(j+n)+((j+n)+(m-k));
-                    l_tmp += options->C[cindex]*conj(source->M[index])*Y_rn[spharm_index];
-                }
-                for (int m = 0; m <= n; ++m)
-                {
-                    int nm = n*n+n+m;
-                    int cindex = jk*options->num_terms*options->num_terms + nm;
-                    int index = MS_INDEX(n,m);
-                    int spharm_index = (j+n)*(j+n)+((j+n)+(m-k));
-                    l_tmp += options->C[cindex]*source->M[index]*Y_rn[spharm_index];
+                    TYPE_COMPLEX M = (m < 0) ? conj(source->M[MS_INDEX(n,-m)]) : source->M[MS_INDEX(n,m)];
+                    l_tmp += options->C[cindex]*M*Y_rn[spharm_index];
                 }
             }
             int index = MS_INDEX(j,k);
