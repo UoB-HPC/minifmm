@@ -11,7 +11,7 @@ void precompute(t_fmm_options* options)
     int num_terms = options->num_terms;
 
     options->C = (TYPE_COMPLEX*)malloc(sizeof(TYPE_COMPLEX)*num_terms*num_terms*num_terms*num_terms);
-    options->A = (TYPE*)malloc(sizeof(TYPE)*num_terms*num_terms);
+    options->A = (TYPE*)malloc(sizeof(TYPE)*2*num_terms*num_terms);
     options->spharm_factor = (TYPE*)malloc(sizeof(TYPE)*num_terms*num_terms);
 
     for (int n = 0; n < num_terms; ++n)
