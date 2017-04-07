@@ -40,17 +40,17 @@ void sph_unit_to_cart_unit(TYPE r, TYPE theta, TYPE phi, TYPE grad_r, TYPE grad_
 // leaf 1 = target, leaf 2 = source
 void p2p(t_fmm_options* options, t_node* target, t_node* source)
 {
-    const TYPE* const __restrict__ tx = target->x;
-    const TYPE* const __restrict__ ty = target->y;
-    const TYPE* const __restrict__ tz = target->z;
-    const TYPE* const __restrict__ sx = source->x;
-    const TYPE* const __restrict__ sy = source->y;
-    const TYPE* const __restrict__ sz = source->z;
-    const TYPE* const __restrict__ sw = source->w;
-    TYPE* const __restrict__ tax = target->ax;
-    TYPE* const __restrict__ tay = target->ay;
-    TYPE* const __restrict__ taz = target->az;
-    TYPE* const __restrict__ tp = target->p;
+    const TYPE* const __restrict__ tx =     __builtin_assume_aligned(target->x,     64);
+    const TYPE* const __restrict__ ty =     __builtin_assume_aligned(target->y,     64);
+    const TYPE* const __restrict__ tz =     __builtin_assume_aligned(target->z,     64);
+    const TYPE* const __restrict__ sx =     __builtin_assume_aligned(source->x,     64);
+    const TYPE* const __restrict__ sy =     __builtin_assume_aligned(source->y,     64);
+    const TYPE* const __restrict__ sz =     __builtin_assume_aligned(source->z,     64);
+    const TYPE* const __restrict__ sw =     __builtin_assume_aligned(source->w,     64);
+    TYPE* const __restrict__ tax =          __builtin_assume_aligned(target->ax,    64);
+    TYPE* const __restrict__ tay =          __builtin_assume_aligned(target->ay,    64);
+    TYPE* const __restrict__ taz =          __builtin_assume_aligned(target->az,    64);
+    TYPE* const __restrict__ tp =           __builtin_assume_aligned(target->p,     64);
 
     const size_t t_num_points = target->num_points;
     const size_t s_num_points = source->num_points;
