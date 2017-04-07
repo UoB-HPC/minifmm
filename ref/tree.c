@@ -27,6 +27,10 @@ t_node* allocate_node(t_fmm_options* options)
     t_node* node = (t_node*)malloc(sizeof(t_node));
     node->M = (TYPE_COMPLEX*)malloc(sizeof(TYPE_COMPLEX)*options->num_multipoles);
     node->L = (TYPE_COMPLEX*)malloc(sizeof(TYPE_COMPLEX)*options->num_multipoles);
+    for (size_t i = 0; i < options->num_multipoles; ++i)
+    {
+        node->M[i] = node->L[i] = 0;
+    }
     ++__num_node_allocations;
     return node;
 }
