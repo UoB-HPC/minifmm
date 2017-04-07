@@ -11,10 +11,10 @@ void precompute(t_fmm_options* options)
     int num_terms = options->num_terms;
 
     options->C = (TYPE_COMPLEX*)malloc(sizeof(TYPE_COMPLEX)*num_terms*num_terms*num_terms*num_terms);
-    options->A = (TYPE*)malloc(sizeof(TYPE)*2*num_terms*num_terms);
-    options->spharm_factor = (TYPE*)malloc(sizeof(TYPE)*num_terms*num_terms);
+    options->A = (TYPE*)malloc(sizeof(TYPE)*(2*num_terms)*(2*num_terms));
+    options->spharm_factor = (TYPE*)malloc(sizeof(TYPE)*(2*num_terms)*(2*num_terms));
 
-    for (int n = 0; n < num_terms; ++n)
+    for (int n = 0; n < 2*num_terms; ++n)
     {
         for (int m = -n; m <= n; ++m)
         {
@@ -31,7 +31,6 @@ void precompute(t_fmm_options* options)
         }
     }
 
-
     for (int j = 0, jk = 0, jknm = 0; j < num_terms; ++j)
     {
         for (int k = -j; k <= j; ++k, ++jk)
@@ -42,10 +41,11 @@ void precompute(t_fmm_options* options)
                 {
                     TYPE sign = (j & 1) ? -1.0 : 1.0;
                     int jnkm = (j+n)*(j+n)+(j+n)+(m-k);
-                    options->C[jknm] = TYPE_CPOW(I, abs(k-m)-abs(k)-abs(m)) * 
-                        (sign*options->A[nm]*options->A[jk]/options->A[jnkm]);
-                        // (sign*compute_a(n, m) *compute_a(j,k)/compute_a(j+n,m-k));
-                    
+                    int expo = abs(k-m)-abs(k)-abs(m);
+                    TYPE_COMPLEX i_pow;
+                    i_pow = (expo & 1) ? I : TYPE_ONE;
+                    i_pow *= (expo & 2) ? -TYPE_ONE : TYPE_ONE;
+                    options->C[jknm] = i_pow * (sign*options->A[nm]*options->A[jk]/options->A[jnkm]);                    
                 }
             }
         }

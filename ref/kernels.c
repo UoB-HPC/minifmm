@@ -100,7 +100,8 @@ void p2p_intrinsics(t_fmm_options* options, t_node* target, t_node* source)
 
     __m256d one = _mm256_set1_pd(1.0);
     size_t i;
-    for (i = 0; i < t_num_points-4; i += 4)
+    size_t lim = (t_num_points < 4) ? 0 : t_num_points - 4;
+    for (i = 0; i < lim; i += 4)
     {
         __m256d ax = _mm256_setzero_pd(), ay = _mm256_setzero_pd(), az = _mm256_setzero_pd(), p = _mm256_setzero_pd();
         __m256d xi = _mm256_loadu_pd(tx+i);
