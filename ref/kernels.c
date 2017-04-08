@@ -289,27 +289,31 @@ void m2l(t_fmm_options* options, t_node* target, t_node* source)
     TYPE dy = target->center[1] - source->center[1];
     TYPE dz = target->center[2] - source->center[2];
 
+    const TYPE* const __restrict C = options->C;
+    const TYPE_COMPLEX* __restrict__ s_M = source->M;
+    const int num_terms = options->num_terms;
+
     TYPE rho, alpha, beta;
     cart_to_sph(dx, dy, dz, &rho, &alpha, &beta);
 
     TYPE_COMPLEX Y_rn[options->num_spharm_terms];
     TYPE inv_rho = TYPE_ONE/rho;
     spharm_r_n(options, inv_rho, inv_rho, alpha, beta, Y_rn);
-    for (int j = 0; j < options->num_terms; ++j)
+    for (int j = 0; j < num_terms; ++j)
     {
         for (int k = 0; k <= j; ++k)
         {
             TYPE_COMPLEX l_tmp = TYPE_ZERO;
             int jk = j*j+j+k;
-            for (int n = 0; n < options->num_terms-j; ++n)
+            for (int n = 0; n < num_terms-j; ++n)
             {
                 for (int m = -n; m <= n; ++m)
                 {
                     int nm = n*n+n+m;
-                    int cindex = jk*options->num_terms*options->num_terms + nm;
+                    int cindex = jk*num_terms*num_terms + nm;
                     int spharm_index = (j+n)*(j+n)+((j+n)+(m-k));
-                    TYPE_COMPLEX M = (m < 0) ? conj(source->M[MS_INDEX(n,-m)]) : source->M[MS_INDEX(n,m)];
-                    l_tmp += options->C[cindex]*M*Y_rn[spharm_index];
+                    TYPE_COMPLEX M = (m < 0) ? conj(s_M[MS_INDEX(n,-m)]) : S_M[MS_INDEX(n,m)];
+                    l_tmp += C[cindex]*M*Y_rn[spharm_index];
                 }
             }
             int index = MS_INDEX(j,k);
