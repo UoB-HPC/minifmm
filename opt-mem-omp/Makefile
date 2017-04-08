@@ -17,7 +17,7 @@ COMPILER_CLANG=clang
 COMPILER_CRAY=cc
 CC=$(COMPILER_$(COMPILER))
 
-FLAGS_GNU = -O3 -g -std=gnu99 -Wall -march=$(ARCH)
+FLAGS_GNU = -O3 -std=gnu99 -Wall -march=$(ARCH)
 FLAGS_INTEL = -O3 -std=gnu99 -Wall -x$(ARCH)
 FLAGS_CRAY = -O3
 FLAGS_CLANG = -O3 -std=gnu99
@@ -29,6 +29,13 @@ LINKER_OPTS_CRAY =
 LINKER_OPTS_CLANG = -Wall
 LINKER_OPTS = $(LINKER_OPTS_$(COMPILER))
 
+OMP_GNU   = -fopenmp
+OMP_INTEL = -qopenmp
+OMP_CRAY  = -homp
+OMP_CLANG = -fopenmp=libomp
+CFLAGS += $(OMP_$(COMPILER))
+LIBS = $(OMP_$(COMPILER))
+
 TARGET=fmm
 TYPE=DOUBLE
 
@@ -38,7 +45,14 @@ else
 	CFLAGS += -DUSE_FLOAT
 endif
 
-LIBS = -lm
+
+HOSTNAME=$(shell hostname)
+ifeq ($(HOSTNAME), swan)
+	LIBS += -L /lus/scratch/p02340/gsl/lib
+	CFLAGS += -I /lus/scratch/p02340/gsl/include
+endif
+
+LIBS += -lgsl -lgslcblas -lm
 
 REF_DIR=$(abspath $(shell pwd)/../ref)
 CFLAGS += -I $(REF_DIR)
