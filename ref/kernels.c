@@ -289,7 +289,7 @@ void m2l(t_fmm_options* options, t_node* target, t_node* source)
     TYPE dy = target->center[1] - source->center[1];
     TYPE dz = target->center[2] - source->center[2];
 
-    const TYPE* const __restrict C = options->C;
+    const TYPE_COMPLEX* const __restrict__ C = options->C;
     const TYPE_COMPLEX* __restrict__ s_M = source->M;
     const int num_terms = options->num_terms;
 
