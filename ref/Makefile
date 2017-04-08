@@ -9,7 +9,7 @@ $(info $(compiler_help))
 COMPILER=GNU
 endif
 
-ARCH=broadwell
+ARCH=native
 
 COMPILER_GNU=gcc
 COMPILER_INTEL=icc

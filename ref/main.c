@@ -11,6 +11,7 @@
 #include "finalise.h"
 
 extern int m2l_calls;
+extern size_t num_particle_interactions;
 int main(int argc, char** argv)
 {
     t_fmm_options options;
@@ -26,6 +27,9 @@ int main(int argc, char** argv)
     verify(&options, &a_err, &p_err);
     printf("%f %f\n", a_err, p_err);
     printf("m2l calls = %d\n", m2l_calls);
+    printf("num_particle_interactions = %zu\n", num_particle_interactions);
+
+    printf("GPI/s = %f\n", (double)num_particle_interactions/1000000000.0/timer.elapsed);
 
     finalise(&options);
     return 0;

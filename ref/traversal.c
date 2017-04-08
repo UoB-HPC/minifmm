@@ -50,6 +50,7 @@ void calc_local_expansions(t_fmm_options* options)
     }
 }
 
+size_t num_particle_interactions = 0;
 void dual_tree_traversal_core(t_fmm_options* options, t_node* target, t_node* source)
 {
     TYPE dx = source->center[0] - target->center[0];
@@ -65,8 +66,16 @@ void dual_tree_traversal_core(t_fmm_options* options, t_node* target, t_node* so
     }
     else if (is_leaf(source) && is_leaf(target))
     {
-        if (target == source) p2p_one_node(options, target); 
-        else p2p(options, target, source);
+        if (target == source) 
+        {
+            p2p_one_node(options, target);
+            num_particle_interactions += target->num_points;
+        }
+        else 
+        {
+            p2p(options, target, source);
+            num_particle_interactions += target->num_points*source->num_points;
+        }
     }
     else
     {
