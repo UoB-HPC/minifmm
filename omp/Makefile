@@ -9,7 +9,7 @@ $(info $(compiler_help))
 COMPILER=GNU
 endif
 
-ARCH=broadwell
+ARCH=native
 
 COMPILER_GNU=gcc
 COMPILER_INTEL=icc
@@ -45,14 +45,7 @@ else
 	CFLAGS += -DUSE_FLOAT
 endif
 
-
-HOSTNAME=$(shell hostname)
-ifeq ($(HOSTNAME), swan)
-	LIBS += -L /lus/scratch/p02340/gsl/lib
-	CFLAGS += -I /lus/scratch/p02340/gsl/include
-endif
-
-LIBS += -lgsl -lgslcblas -lm
+LIBS += -lm
 
 REF_DIR=$(abspath $(shell pwd)/../ref)
 CFLAGS += -I $(REF_DIR)
