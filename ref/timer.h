@@ -2,6 +2,7 @@
 
 #if defined(__unix__) || defined(__linux__) || defined(__APPLE__)
 #include <sys/time.h>
+#include <stdio.h>
 
 typedef struct
 {
@@ -10,12 +11,7 @@ typedef struct
     double elapsed;
 }t_timer;
 
-double wtime()
-{
-    struct timeval t;
-    gettimeofday(&t, NULL);
-    return t.tv_sec + t.tv_usec * 1.0E-6;
-}
+double wtime();
 
 static inline void start(t_timer* timer)
 {

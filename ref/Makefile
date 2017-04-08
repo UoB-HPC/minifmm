@@ -42,7 +42,7 @@ endif
 LIBS += -lm
 
 HEADERS = $(wildcard *.h)
-OBJECTS=main.o util.o tree.o parse_args.o kernels.o traversal.o verify.o initialise.o spharm.o finalise.o
+OBJECTS=main.o util.o tree.o parse_args.o kernels.o traversal.o verify.o initialise.o spharm.o finalise.o timer.o
 
 default: $(TARGET)
 
