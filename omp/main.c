@@ -21,10 +21,12 @@ int main(int argc, char** argv)
     start(&timer);
 
     #pragma omp parallel
-    #pragma omp single
     {
-        printf("running computation on %d threads\n", omp_get_num_threads());
-        perform_fmm(&options);
+        #pragma omp single
+        {
+            printf("running computation on %d threads\n", omp_get_num_threads());
+            perform_fmm(&options);
+        }
     }
     stop(&timer);
     timer_print(&timer, "fmm");

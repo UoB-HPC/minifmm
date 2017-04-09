@@ -289,7 +289,7 @@ void m2l(t_fmm_options* options, t_node* target, t_node* source)
     TYPE dy = target->center[1] - source->center[1];
     TYPE dz = target->center[2] - source->center[2];
 
-    const TYPE* const __restrict C = options->C;
+    const TYPE_COMPLEX* const __restrict__ C = options->C;
     const TYPE_COMPLEX* __restrict__ s_M = source->M;
     const int num_terms = options->num_terms;
 
@@ -312,7 +312,7 @@ void m2l(t_fmm_options* options, t_node* target, t_node* source)
                     int nm = n*n+n+m;
                     int cindex = jk*num_terms*num_terms + nm;
                     int spharm_index = (j+n)*(j+n)+((j+n)+(m-k));
-                    TYPE_COMPLEX M = (m < 0) ? conj(s_M[MS_INDEX(n,-m)]) : S_M[MS_INDEX(n,m)];
+                    TYPE_COMPLEX M = (m < 0) ? conj(s_M[MS_INDEX(n,-m)]) : s_M[MS_INDEX(n,m)];
                     l_tmp += C[cindex]*M*Y_rn[spharm_index];
                 }
             }
