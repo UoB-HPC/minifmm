@@ -31,6 +31,7 @@ int main(int argc, char** argv)
         {
             num_threads = omp_get_num_threads();
             thread_p2p_times = (double*)malloc(sizeof(double)*num_threads);
+            for (int i = 0; i  < num_threads; ++i) thread_p2p_times[i] = 0.0;
             thread_p2p_interactions = (size_t*)malloc(sizeof(size_t)*num_threads);
             printf("running computation on %d threads\n", omp_get_num_threads());
             perform_fmm(&options);
