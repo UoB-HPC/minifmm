@@ -49,7 +49,8 @@ int main(int argc, char** argv)
     for (int i = 0; i < num_threads; ++i)
     {
         printf("time = %f, interactions = %zu\n", thread_p2p_times[i], thread_p2p_interactions[i]);
-        double gpi = (double)thread_p2p_interactions[i]/1000000000.0/thread_p2p_times[i];
+        double gpi = (thread_p2p_times[i] > 0.0) ? (double)thread_p2p_interactions[i]/1000000000.0/thread_p2p_times[i] :
+            0.0;
         gpi_avg += gpi;
         gpi_max = MAX(gpi_max, gpi);
     }
