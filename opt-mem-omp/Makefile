@@ -47,14 +47,18 @@ endif
 
 LIBS += -lm
 
+OMP_DIR=$(abspath $(shell pwd)/../omp)
 REF_DIR=$(abspath $(shell pwd)/../ref)
 CFLAGS += -I $(REF_DIR)
 
 HEADERS=$(wildcard $(REF_DIR)/*.h)
 REF_SRCS=$(wildcard $(REF_DIR)/*.c)
-DIFF_SRCS=$(wildcard *.c)
+OPT_OMP_SRCS=$(wildcard *.c)
+OMP_SRCS = $(wildcard $(OMP_DIR)/*.c)
+DIFF_OMP_SRCS = $(addprefix $(OMP_DIR)/, $(filter-out $(notdir $(OPT_OMP_SRCS)), $(notdir $(OMP_SRCS))))
+DIFF_SRCS = $(DIFF_OMP_SRCS) $(OPT_OMP_SRCS)
 
-SRCS = $(addprefix $(REF_DIR)/, $(filter-out $(DIFF_SRCS), $(notdir $(REF_SRCS))))
+SRCS = $(addprefix $(REF_DIR)/, $(filter-out $(notdir $(DIFF_SRCS)), $(notdir $(REF_SRCS))))
 SRCS += $(DIFF_SRCS)
 OBJS = $(patsubst %.c,%.o,$(SRCS))
 
