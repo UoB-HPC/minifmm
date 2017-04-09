@@ -1,9 +1,11 @@
 #include <stdlib.h>
+#include <omp.h>
 
 #include "type.h"
 #include "tree.h"
 #include "kernels.h"
 #include "traversal.h"
+#include "timer.h"
 
 void calc_multipoles_at_nodes_core(t_fmm_options* options, t_node* node)
 {
@@ -77,6 +79,9 @@ void calc_local_expansions(t_fmm_options* options)
     }
 }
 
+extern size_t* thread_p2p_interactions;
+extern double* thread_p2p_times;
+
 void dual_tree_traversal_core(t_fmm_options* options, t_node* target, t_node* source)
 {
     TYPE dx = source->center[0] - target->center[0];
@@ -106,11 +111,31 @@ void dual_tree_traversal_core(t_fmm_options* options, t_node* target, t_node* so
         const size_t end = target->num_points;
 #endif
         if (source == target)
-        #pragma omp task depend(out: ax[0:end], ay[0:end], az[0:end], p[0:end])
-            p2p_one_node(options, target); 
+        {
+            #pragma omp task depend(out: ax[0:end], ay[0:end], az[0:end], p[0:end])
+            {
+                int thread_num = omp_get_thread_num();
+                t_timer timer;
+                start(&timer);
+                p2p_one_node(options, target); 
+                stop(&timer);
+                thread_p2p_times[thread_num] += timer.elapsed;
+                thread_p2p_interactions[thread_num] += target->num_points;
+            }
+        }
         else
-        #pragma omp task depend(out: ax[0:end], ay[0:end], az[0:end], p[0:end])
-            p2p(options, target, source);
+        {
+            #pragma omp task depend(out: ax[0:end], ay[0:end], az[0:end], p[0:end])
+            {
+                int thread_num = omp_get_thread_num();
+                t_timer timer;
+                start(&timer);
+                p2p(options, target, source); 
+                stop(&timer);
+                thread_p2p_times[thread_num] += timer.elapsed;
+                thread_p2p_interactions[thread_num] += target->num_points*source->num_points;
+            }
+        }
     }
     else
     {
