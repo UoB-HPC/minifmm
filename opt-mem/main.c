@@ -12,6 +12,8 @@
 #include "tree-opt.h"
 
 extern int m2l_calls;
+extern size_t num_particle_interactions;
+extern double p2p_timer;
 int main(int argc, char** argv)
 {
     t_fmm_options options;
@@ -29,6 +31,9 @@ int main(int argc, char** argv)
     verify(&options, &a_err, &p_err);
     printf("\nforce err. = %-10.15f\npot. err. = %-10.15f\n", a_err, p_err);
     printf("m2l calls = %d\n", m2l_calls);
+    printf("num_particle_interactions = %zu\n", num_particle_interactions);
+
+    printf("GPI/s = %f\n", (double)num_particle_interactions/1000000000.0/p2p_timer);
 
     finalise(&options);
     return 0;
