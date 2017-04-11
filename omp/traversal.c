@@ -97,7 +97,7 @@ void dual_tree_traversal_core(t_fmm_options* options, t_node* target, t_node* so
         const TYPE_COMPLEX* M __attribute__((unused)) = source->M;
         const TYPE_COMPLEX* L __attribute__((unused)) = target->L;
         const size_t num_multipoles __attribute__((unused)) = options->num_multipoles;
-        #pragma omp task depend(in: M[0:num_multipoles]) depend(out: L[0:num_multipoles])
+        // #pragma omp task depend(in: M[0:num_multipoles]) depend(out: L[0:num_multipoles])
 #endif
         m2l(options, target, source);
     }
@@ -108,11 +108,11 @@ void dual_tree_traversal_core(t_fmm_options* options, t_node* target, t_node* so
         const TYPE* ay __attribute__((unused)) = target->ay;
         const TYPE* az __attribute__((unused)) = target->az;
         const TYPE* p __attribute__((unused)) = target->p;
-        const size_t end = target->num_points;
+        const size_t __attribute__((unused)) end = target->num_points;
 #endif
         if (source == target)
         {
-            #pragma omp task depend(out: ax[0:end], ay[0:end], az[0:end], p[0:end])
+            // #pragma omp task depend(out: ax[0:end], ay[0:end], az[0:end], p[0:end])
             {
                 int thread_num = omp_get_thread_num();
                 t_timer timer;
@@ -125,7 +125,7 @@ void dual_tree_traversal_core(t_fmm_options* options, t_node* target, t_node* so
         }
         else
         {
-            #pragma omp task depend(out: ax[0:end], ay[0:end], az[0:end], p[0:end])
+            // #pragma omp task depend(out: ax[0:end], ay[0:end], az[0:end], p[0:end])
             {
                 int thread_num = omp_get_thread_num();
                 t_timer timer;
@@ -155,13 +155,16 @@ void dual_tree_traversal_core(t_fmm_options* options, t_node* target, t_node* so
         else if (target_sz >= source_sz)
         {
             for (size_t i = 0; i < target->num_children; ++i)
+                #pragma omp task
                 dual_tree_traversal_core(options, target->child[i], source);
         }
         else
         {
             for (size_t i = 0; i < source->num_children; ++i)
+                #pragma omp task
                 dual_tree_traversal_core(options, target, source->child[i]);
         }
+        #pragma omp taskwait
     }
 }
 
@@ -173,6 +176,8 @@ void dual_tree_traversal(t_fmm_options* options)
 void perform_fmm(t_fmm_options* options)
 {
     calc_multipoles_at_nodes(options);
+    #pragma omp taskwait
     dual_tree_traversal(options);
+    #pragma omp taskwait
     calc_local_expansions(options);
 }
