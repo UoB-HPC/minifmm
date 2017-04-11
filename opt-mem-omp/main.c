@@ -59,6 +59,6 @@ int main(int argc, char** argv)
 
     TYPE a_err, p_err;
     verify(&options, &a_err, &p_err);
-    printf("%.15f %.15f\n", a_err, p_err);
+    printf("\nforce err. = %-10.15f\npot. err. = %-10.15f\n", a_err, p_err);
     printf("m2l calls = %d\n", m2l_calls);
 }
