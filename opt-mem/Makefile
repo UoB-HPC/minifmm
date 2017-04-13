@@ -20,7 +20,7 @@ CC=$(COMPILER_$(COMPILER))
 FLAGS_GNU = -O3 -g -std=gnu99 -Wall -march=$(ARCH)
 FLAGS_INTEL = -O3 -std=gnu99 -Wall -x$(ARCH)
 FLAGS_CRAY = -O3
-FLAGS_CLANG = -O3 -std=gnu99
+FLAGS_CLANG = -O3 -std=gnu99 -march=$(ARCH)
 CFLAGS = $(FLAGS_$(COMPILER))
 
 LINKER_OPTS_GNU = -Wall
