@@ -13,7 +13,9 @@ The programming model must be the same name as the directory (i.e. `omp-tasks`).
 Running
 -------
 
+```
 ./fmm.<Programming Model> <Arguments>
+```
 
 Valid arguments
 
