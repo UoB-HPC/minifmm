@@ -1,8 +1,8 @@
-*.txt
-*.optrpt
-*.log
-*.st
+fmm.*
+fmm.*
 
+# Prerequisites
+*.d
 
 # Compiled Object files
 *.slo
@@ -33,7 +33,3 @@
 *.exe
 *.out
 *.app
-fmm
-fmm-*
-
-*.pbs
