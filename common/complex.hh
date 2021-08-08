@@ -4,7 +4,7 @@
 
 #include "utils.hh"
 
-#if defined(__x86_64__) && (__GNUC__ >= 8)
+#if !defined(__NVCC__)  && defined(__x86_64__) && (__GNUC__ >= 8)
 #warning falling back to std complex numbers
 template <class T>
 using complex_t = std::complex<T>;

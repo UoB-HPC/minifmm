@@ -9,108 +9,26 @@
 
 #include <kokkos-utils.hh>
 
-#include <gpu-kernels.hh>
+#include <gpu-kernels-no-atomics.hh>
 
 #ifndef KOKKOS_SCHEDULER
 #define KOKKOS_SCHEDULER TaskSchedulerMultiple
 #endif
 
-//template <class T>
-//void upwards_pass(FMM<T>* fmm, node_t<T>* node)
-//{
-//  for (size_t i = 0; i < node->num_children; ++i) {
-//#pragma omp task
-//    upwards_pass(fmm, &fmm->nodes[node->child[i]]);
-//  }
-//
-//#pragma omp taskwait
-//
-//  if (node->is_leaf())
-//    p2m(fmm, node);
-//  else
-//    m2m(fmm, node);
-//}
-
-template <class Scheduler, class T>
-struct upwards_task {
-  using value_type = void;
-  using future_type = Kokkos::BasicFuture<void, Scheduler>;
-
-  FMM<T>* fmm;
-  node_t<T>* node;
-  future_type respawn_future;
-
-  KOKKOS_INLINE_FUNCTION
-  upwards_task(FMM<T>* arg_fmm, node_t<T>* arg_node)
-      : fmm{arg_fmm}, node{arg_node}, respawn_future()
-  {
-  }
-
-  KOKKOS_INLINE_FUNCTION
-  void operator()(typename Scheduler::member_type& member)
-  {
-    if (node->is_leaf()) {
-#ifndef __CUDA_ARCH__
-      p2m(fmm, node);
-#else
-      //p2m_gpu<32, 4>(fmm, node);
-#endif
-    }
-    else if (respawn_future.is_null()) {
-      future_type futures[8];
-      for (size_t i = 0; i < node->num_children; ++i) {
-        node_t<T>* child = fmm->nodes + node->child[i];
-        futures[i] =
-            Kokkos::task_spawn(Kokkos::TaskSingle(member.scheduler()),
-                               upwards_task(fmm, child));
-      }
-      for (size_t i = node->num_children; i < 8; ++i) futures[i] = future_type();
-      respawn_future = member.scheduler().when_all(futures, node->num_children);
-      Kokkos::respawn(this, respawn_future);
-    }
-    else {
-#ifndef __CUDA_ARCH__
-      m2m(fmm, node);
-#else
-      //m2m_gpu<32, 4>(fmm, node);
-#endif
-    }
-  }
-};
-
 template <class T>
-void kokkos_upwards(FMM<T>* fmm)
+void upwards_pass(FMM<T>* fmm, node_t<T>* node)
 {
-#ifdef __CUDACC__
-  FMM<T>* h_fmm;
-  FMM<T>* d_fmm;
-  init_device_fmm(fmm, &h_fmm, &d_fmm);
-  node_t<T>* root_node = h_fmm->nodes + h_fmm->root;
-  FMM<T>* device_fmm = d_fmm;
-#else
-  FMM<T>* device_fmm = fmm;
-  node_t<T>* root_node = fmm->nodes + fmm->root;
-#endif
+  for (size_t i = 0; i < node->num_children; ++i) {
+#pragma omp task
+    upwards_pass(fmm, &fmm->nodes[node->child[i]]);
+  }
 
-  const size_t min_block_size = 32;
-  const size_t max_block_size = 128;
-  const size_t super_block_size = 10000;
-  const size_t memory_capacity = 1024 * 1024 * 1024;
+#pragma omp taskwait
 
-  using Scheduler = Kokkos::TaskScheduler<Kokkos::DefaultExecutionSpace>;
-
-  Scheduler sched(typename Scheduler::memory_space(), memory_capacity,
-                  min_block_size, std::min(max_block_size, memory_capacity),
-                  std::min(super_block_size, memory_capacity));
-
-  Kokkos::BasicFuture<void, Scheduler> f = Kokkos::host_spawn(
-      Kokkos::TaskSingle(sched), upwards_task<Scheduler, T>(device_fmm, root_node));
-
-  Kokkos::wait(sched);
-
-#ifdef __CUDACC__
-  fini_device_fmm(fmm, h_fmm, d_fmm);
-#endif
+  if (node->is_leaf())
+    p2m(fmm, node);
+  else
+    m2m(fmm, node);
 }
 
 template <class T>
@@ -200,13 +118,21 @@ struct dual_tree_task {
     // TODO for some reason the compiler still tries to compile this function
 #ifdef __CUDACC__
     if ((d1 + d2) * (d1 + d2) < fmm->theta2 * r2) {
+      if (member.team_rank() == 0) lock(&target->m2l_lock);
+      member.team_barrier();
       m2l_gpu<32, 4>(fmm, target, source);
+      if (member.team_rank() == 0) unlock(&target->m2l_lock);
+      member.team_barrier();
     }
     else if (source->is_leaf() && target->is_leaf()) {
+      if (member.team_rank() == 0) lock(&target->p2p_lock);
+      member.team_barrier();
       if (target == source)
         p2p_gpu<32, 16, 4, 32, 4>(fmm, target);
       else
         p2p_gpu<32, 16, 4, 32, 4>(fmm, target, source);
+      if (member.team_rank() == 0) unlock(&target->p2p_lock);
+      member.team_barrier();
     }
     else {
       T target_sz = target->rad;
@@ -331,6 +257,11 @@ kokkos_dtt(FMM<T>* fmm)
   const size_t super_block_size = 4096;
   const size_t memory_capacity = 1024 * 1024 * 1024;
 
+#ifdef __CUDACC__
+  const int stack_size = 8192;
+  CUDACHK(cudaDeviceSetLimit(cudaLimitStackSize, stack_size));
+#endif
+
   Scheduler sched(typename Scheduler::memory_space(), memory_capacity,
                   min_block_size, std::min(max_block_size, memory_capacity),
                   std::min(super_block_size, memory_capacity));
@@ -357,22 +288,18 @@ void perform_traversals(FMM<T>* fmm)
       Kokkos::KOKKOS_SCHEDULER<Kokkos::DefaultExecutionSpace>;
 
   Kokkos::initialize();
-#ifdef __CUDACC__
-  const int stack_size = 8192;
-  CUDACHK(cudaDeviceSetLimit(cudaLimitStackSize, stack_size));
-#endif
 
   Timer timer;
   Timer tot_timer;
 
   timer.start();
   tot_timer.start();
-  kokkos_upwards(fmm);
+#pragma omp parallel
+#pragma omp single
+  upwards_pass(fmm, &fmm->nodes[fmm->root]);
   timer.stop();
   printf("\n");
   printf("%-20s %12.8f\n", "Upwards Time (s) ", timer.elapsed());
-  Kokkos::finalize();
-  exit(0);
 
   timer.start();
   kokkos_dtt<Scheduler>(fmm);
@@ -391,4 +318,7 @@ void perform_traversals(FMM<T>* fmm)
   printf("%-20s %12.8f\n", "Total Time (s) ", tot_timer.elapsed());
   printf("--------------------\n\n");
 
+  Kokkos::finalize();
 }
+
+
