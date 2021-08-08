@@ -34,9 +34,7 @@ Information
 -----------
 
 Please cite using:
-```
-Atkinson, P., & McIntosh-Smith, S. (2017). On the Performance of Parallel Tasking Runtimes for an Irregular Fast Multipole Method Application. In Scaling OpenMP for Exascale Performance and Portability (pp. 92–106). Springer International Publishing. https://doi.org/10.1007/978-3-319-65578-9_7
-```
+>Atkinson, P., & McIntosh-Smith, S. (2017). On the Performance of Parallel Tasking Runtimes for an Irregular Fast Multipole Method Application. In Scaling OpenMP for Exascale Performance and Portability (pp. 92–106). Springer International Publishing. https://doi.org/10.1007/978-3-319-65578-9_7
 
 For further information, please refer to: https://patrickatkinson.co.uk/phd-thesis.pdf
 
